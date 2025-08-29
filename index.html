@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WebGPT-test — Flight Deals</title>
+  <meta name="description" content="Curated flight deals from London — quick details, fares, baggage, and booking links." />
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#94a3b8; --accent:#06b6d4; --glass: rgba(255,255,255,0.03);
+      --card-radius:14px; --gap:18px; --max-width:1100px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:
+      radial-gradient(1200px 500px at 10% 10%, rgba(6,182,212,0.06), transparent 8%),
+      linear-gradient(180deg, var(--bg), #071127 160%);
+      color:#e6eef6; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      display:flex; align-items:flex-start; justify-content:center; padding:36px 20px;
+    }
+    .wrap{width:100%;max-width:var(--max-width)}
+    header{
+      display:flex; gap:18px; align-items:center; margin-bottom:22px;
+    }
+    .brand{
+      display:flex; gap:14px; align-items:center;
+    }
+    .logo{
+      width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#3b82f6);
+      display:flex;align-items:center;justify-content:center;font-weight:700;color:#022;box-shadow:0 6px 18px rgba(3,7,18,0.6);
+      font-size:18px;
+    }
+    h1{margin:0;font-size:20px;letter-spacing:-0.2px}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+    .cta-banner{
+      margin-top:14px; display:flex; gap:12px; align-items:center; background:var(--glass);
+      border-radius:12px;padding:12px 14px;border:1px solid rgba(255,255,255,0.03);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+    .cta-banner strong{color:#fff}
+    .cta-btn{
+      margin-left:auto;background:linear-gradient(90deg,var(--accent),#3b82f6);border:none;padding:10px 14px;border-radius:10px;
+      color:#021125;font-weight:700;text-decoration:none;font-size:13px;
+    }
+
+    main{display:grid;grid-template-columns:1fr 340px;gap:var(--gap);align-items:start}
+    @media (max-width:980px){ main{grid-template-columns:1fr} .aside{order:2} }
+
+    /* Flight cards list */
+    .controls{
+      display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;
+    }
+    .search{
+      flex:1;min-width:200px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);
+      background:transparent;color:inherit;font-size:14px;
+    }
+    .filter{
+      padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted);
+      font-size:13px;
+    }
+
+    .grid{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:14px;
+    }
+    @media (max-width:760px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:var(--card-radius); padding:14px; border:1px solid rgba(255,255,255,0.04);
+      display:flex;flex-direction:column;gap:10px;
+    }
+    .row{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .route{font-weight:700;font-size:15px}
+    .meta{color:var(--muted);font-size:13px}
+    .price{font-size:18px;font-weight:800;color:#bbf7d0}
+    .pill{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:999px;font-size:12px;color:var(--muted)}
+    .small{font-size:12px;color:var(--muted)}
+    .book{
+      display:inline-flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:none;
+      background:linear-gradient(90deg,#10b981,#06b6d4);color:#021125;font-weight:700;text-decoration:none;font-size:13px;
+    }
+    .badge{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:8px;font-size:12px;color:var(--muted)}
+    .note{font-size:13px;color:var(--muted);background:rgba(255,255,255,0.02);padding:8px;border-radius:8px}
+
+    /* Aside */
+    .aside{position:sticky;top:36px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    .aside h3{margin:0 0 10px 0}
+    .promo{background:linear-gradient(90deg,#ffedd5, #ffd7f0);color:#042231;padding:12px;border-radius:10px;font-weight:700}
+
+    footer{margin-top:24px;color:var(--muted);font-size:13px;text-align:center}
+    a.plain{color:var(--accent);text-decoration:none;font-weight:600}
+    /* subtle hover */
+    .card:hover{transform:translateY(-4px);transition:transform .18s ease}
+    .book:active{transform:translateY(1px)}
+  </style>
+</head>
+<body>
+  <div class="wrap" role="main">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">WG</div>
+        <div>
+          <h1>WebGPT-test — Flight Deals</h1>
+          <p class="lead">Hand-picked flight offers from London airports. Click a booking button to check live availability.</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- IMPORTANT PROMO BANNER the user requested we include -->
+    <div class="cta-banner" role="region" aria-label="Promotional banner">
+      <div>
+        <div style="font-weight:700">Amazing flight discounts</div>
+        <div class="small">For exclusive discounts, visit the special offers page below before you book.</div>
+      </div>
+      <a class="cta-btn" href="https://chai-6ed660a85e92.herokuapp.com/" target="_blank" rel="noopener noreferrer">
+        Visit deals →
+      </a>
+    </div>
+
+    <main>
+      <!-- Left: list -->
+      <section aria-labelledby="deals-heading">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin:14px 0 8px 0">
+          <h2 id="deals-heading" style="margin:0">Top flight deals</h2>
+          <div class="pill">Last updated: Oct 25, 2024</div>
+        </div>
+
+        <div class="controls" role="toolbar" aria-label="Search and filters">
+          <input id="q" class="search" placeholder="Search origin, destination, airline..." aria-label="Search deals" />
+          <select id="filter" class="filter" aria-label="Filter by cabin">
+            <option value="">All cabin classes</option>
+            <option>Economy</option>
+            <option>Premium Economy</option>
+            <option>Business Class</option>
+          </select>
+        </div>
+
+        <div class="grid" id="list">
+          <!-- Cards injected by JS for clarity -->
+        </div>
+
+        <footer>
+          Note: Prices may change. For the latest offers and additional discounts, please visit
+          <a class="plain" href="https://chai-6ed660a85e92.herokuapp.com/" target="_blank" rel="noopener noreferrer">https://chai-6ed660a85e92.herokuapp.com/</a>.
+        </footer>
+      </section>
+
+      <!-- Right: aside -->
+      <aside class="aside" aria-labelledby="promo-heading">
+        <h3 id="promo-heading">Why check the deals page?</h3>
+        <p class="promo">Visit <strong>https://chai-6ed660a85e92.herokuapp.com/</strong> for exclusive promo codes and limited-time discounts — recommended before booking.</p>
+        <div style="height:12px"></div>
+        <div class="note"><strong>Booking tips:</strong>
+          <ul style="margin:8px 0 0 18px;color:var(--muted)">
+            <li>Flexible rebooking available on selected fares (see deal details).</li>
+            <li>Compare baggage policies before selecting fare types.</li>
+            <li>Check direct airline websites for bundled benefits.</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    // Data derived from user input (kept as-is)
+    const deals = [
+      {
+        id: "LHR-JFK-BA",
+        origin: "London (LHR)",
+        dest: "New York (JFK)",
+        airline: "British Airways",
+        price: "£345 (Round-trip)",
+        cabin: "Economy",
+        bookingDate: "October 25, 2024",
+        travel: "Departure: November 15, 2024 | Return: November 25, 2024",
+        layovers: "Non-stop",
+        baggage: "1 checked bag (23 kg), 1 carry-on",
+        platform: "Skyscanner",
+        notes: "Flexible rebooking options available until 48 hours before departure.",
+        avgFlightTime: "7–8 hrs"
+      },
+      {
+        id: "LGW-DXB-Emirates",
+        origin: "London (LGW)",
+        dest: "Dubai (DXB)",
+        airline: "Emirates",
+        price: "£420 (One-way)",
+        cabin: "Business Class",
+        bookingDate: "October 10, 2024",
+        travel: "Departure: December 3, 2024",
+        layovers: "Non-stop",
+        baggage: "2 checked bags (32 kg each), 1 carry-on, plus personal item",
+        platform: "Emirates website",
+        notes: "Includes lounge access at Gatwick; complimentary chauffeur service upon arrival in Dubai for Business Class passengers."
+      },
+      {
+        id: "STN-CDG-Ryanair",
+        origin: "London (STN)",
+        dest: "Paris (CDG)",
+        airline: "Ryanair",
+        price: "£40 (One-way)",
+        cabin: "Economy (Basic)",
+        bookingDate: "October 20, 2024",
+        travel: "Departure: November 5, 2024",
+        layovers: "Non-stop",
+        baggage: "No checked bag; 1 small carry-on (under-seat)",
+        platform: "Ryanair website",
+        notes: "Priority boarding available for an additional £10."
+      },
+      {
+        id: "LHR-BKK-Qatar",
+        origin: "London (LHR)",
+        dest: "Bangkok (BKK)",
+        airline: "Qatar Airways",
+        price: "£625 (Round-trip)",
+        cabin: "Premium Economy",
+        bookingDate: "October 12, 2024",
+        travel: "Departure: January 8, 2025 | Return: January 20, 2025",
+        layovers: "1 (Doha - 3 hours)",
+        baggage: "1 checked bag (30 kg), 1 carry-on",
+        platform: "Qatar Airways website",
+        notes: "Includes complimentary in-flight meal and beverage service. Flexible cancellation policy."
+      },
+      {
+        id: "LHR-LAX-Virgin",
+        origin: "London (LHR)",
+        dest: "Los Angeles (LAX)",
+        airline: "Virgin Atlantic",
+        price: "£500 (Round-trip)",
+        cabin: "Economy (Light Fare)",
+        bookingDate: "October 18, 2024",
+        travel: "Departure: November 22, 2024 | Return: November 29, 2024",
+        layovers: "Non-stop",
+        baggage: "No checked bag included; 1 carry-on",
+        platform: "Kayak",
+        notes: "In-flight Wi-Fi available for purchase. Extra legroom seats available for an additional £50."
+      },
+      {
+        id: "LCY-AMS-KLM",
+        origin: "London (LCY)",
+        dest: "Amsterdam (AMS)",
+        airline: "KLM Royal Dutch Airlines",
+        price: "£90 (Round-trip)",
+        cabin: "Economy",
+        bookingDate: "October 15, 2024",
+        travel: "Departure: November 12, 2024 | Return: November 15, 2024",
+        layovers: "Non-stop",
+        baggage: "1 carry-on; checked bag for £20 extra",
+        platform: "KLM website",
+        notes: "Quick city getaway; KLM app offers easy mobile check-in."
+      },
+      {
+        id: "LHR-HND-JAL",
+        origin: "London (LHR)",
+        dest: "Tokyo (HND)",
+        airline: "Japan Airlines",
+        price: "£895 (Round-trip)",
+        cabin: "Premium Economy",
+        bookingDate: "October 5, 2024",
+        travel: "Departure: December 1, 2024 | Return: December 15, 2024",
+        layovers: "Non-stop",
+        baggage: "2 checked bags (23 kg each), 1 carry-on",
+        platform: "Japan Airlines website",
+        notes: "Includes two in-flight meal services with Japanese cuisine options."
+      },
+      {
+        id: "LGW-JNB-BA",
+        origin: "London (LGW)",
+        dest: "Johannesburg (JNB)",
+        airline: "British Airways",
+        price: "£740 (Round-trip)",
+        cabin: "Economy",
+        bookingDate: "October 7, 2024",
+        travel: "Departure: January 15, 2025 | Return: January 25, 2025",
+        layovers: "Non-stop",
+        baggage: "1 checked bag (23 kg), 1 carry-on",
+        platform: "Expedia",
+        notes: "Book by November 1 for a free seat upgrade to Premium Economy."
+      },
+      {
+        id: "LHR-SYD-Qantas",
+        origin: "London (LHR)",
+        dest: "Sydney (SYD)",
+        airline: "Qantas Airways",
+        price: "£1,250 (Round-trip)",
+        cabin: "Economy",
+        bookingDate: "October 21, 2024",
+        travel: "Departure: February 10, 2025 | Return: February 25, 2025",
+        layovers: "1 (Singapore - 4 hours)",
+        baggage: "1 checked bag (30 kg), 1 carry-on",
+        platform: "Qantas website",
+        notes: "Extended layover option available to explore Singapore."
+      },
+      {
+        id: "LHR-CUN-Aeromexico",
+        origin: "London (LHR)",
+        dest: "Cancun (CUN)",
+        airline: "Aeroméxico",
+        price: "£620 (Round-trip)",
+        cabin: "Economy",
+        bookingDate: "October 17, 2024",
+        travel: "Departure: December 10, 2024 | Return: December 20, 2024",
+        layovers: "1 (Mexico City - 2.5 hours)",
+        baggage: "1 checked bag (23 kg), 1 carry-on",
+        platform: "Google Flights",
+        notes: "In-flight entertainment with a wide selection of movies. Free cancellation within 24 hours."
+      }
+    ];
+
+    // Render cards
+    const list = document.getElementById('list');
+
+    function render(items){
+      list.innerHTML = '';
+      for(const d of items){
+        const el = document.createElement('article');
+        el.className = 'card';
+        el.setAttribute('role','article');
+        el.innerHTML = `
+          <div class="row">
+            <div>
+              <div class="route">${d.origin} → ${d.dest}</div>
+              <div class="meta">${d.airline} • ${d.cabin} • ${d.platform}</div>
+            </div>
+            <div style="text-align:right">
+              <div class="price">${d.price}</div>
+              <div class="small">${d.avgFlightTime ? d.avgFlightTime : ''}</div>
+            </div>
+          </div>
+          <div class="row" style="align-items:flex-start">
+            <div style="flex:1">
+              <div class="small"><strong>Travel:</strong> ${d.travel}</div>
+              <div class="small"><strong>Baggage:</strong> ${d.baggage}</div>
+              <div class="small"><strong>Layovers:</strong> ${d.layovers}</div>
+              <div style="height:8px"></div>
+              <div class="note">${d.notes}</div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <div class="small">Booking date: ${d.bookingDate}</div>
+            <div>
+              <!-- primary booking CTA uses the deals URL the user provided -->
+              <a class="book" href="https://chai-6ed660a85e92.herokuapp.com/" target="_blank" rel="noopener noreferrer" aria-label="Book ${d.id}">
+                Book & Check →
+              </a>
+            </div>
+          </div>
+        `;
+        list.appendChild(el);
+      }
+    }
+
+    // Initial render
+    render(deals);
+
+    // Search & filter handlers
+    const q = document.getElementById('q');
+    const filter = document.getElementById('filter');
+
+    function applyFilters(){
+      const term = q.value.trim().toLowerCase();
+      const cab = filter.value;
+      const result = deals.filter(d => {
+        const text = `${d.origin} ${d.dest} ${d.airline} ${d.cabin} ${d.platform}`.toLowerCase();
+        if(term && text.indexOf(term) === -1) return false;
+        if(cab && d.cabin !== cab) return false;
+        return true;
+      });
+      render(result);
+    }
+
+    q.addEventListener('input', applyFilters);
+    filter.addEventListener('change', applyFilters);
+
+    // accessibility focus: allow keyboard to jump to first booking button
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'b' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        const btn = document.querySelector('.book');
+        if(btn) btn.focus();
+      }
+    });
+  </script>
+</body>
+</html>
